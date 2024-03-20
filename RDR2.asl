@@ -3,8 +3,7 @@
 //
 // Mission counter: Passed missions count in the progress statistics screen. Variable counts all missions including strangers.
 // Loading: 0 during gameplay, 1-32767 when loading a save file, >32768 during black screen. Restart game once or twice to
-//     help with scanning (as the address is static). The correct value should slowly tick down
-//     while loading (and occasionally jump to a new starting value for the countdown).
+//     help with scanning (as the address is static). The correct value remains unchanged during loading.
 // Checkpoint: Address always ends with 0050.
 // Example values for testing during Who Is Not Without Sin:
 //     3: Standing outside after intro
