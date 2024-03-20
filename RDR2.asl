@@ -1,9 +1,27 @@
+// When variables change for game patches, the offsets will generally stay the same.
+// This means the only change should be in the base address.
+//
+// Mission counter: Passed missions count in the progress statistics screen.
+// Loading: 0 during gameplay, 1-32767 when loading a save file. Restart game once or twice to
+//     help with scanning (as the address is static). The correct value should slowly tick down
+//     while loading (and occasionally jump to a new starting value for the countdown).
+// Checkpoint: Example values for testing during Who Is Not Without Sin:
+//     3: Standing outside after intro
+//     4: Fighting the first NPC
+//     5: Chasing the witness
+//     6: After shooting witness, before approaching bridge
+//     7: Unstucking Swansons' foot
+//     25: Taking Swanson back to camp
+// Mission: Should be "none" when not on mission.
+// In cutscene: 0 if not, any other value if so
+// Cutscene: Who Is Not Without Sin intro "RRVRD_RSC_1", cutscene after railroad bridge "REV1_MSC3"
+
 state("RDR2")
 {
 	byte mission_counter: 0x3EB2F00, 0x38;
 	long loading: 0x3ED181E;
 	byte checkpoint: 0x59B2FE0, 0x50;
-	string255 mission: 0x3EA0EC0;
+	string255 mission: 0x528DDC0;
 	byte in_cutscene: 0x49F8648, 0xB208;
 	string255 cutscene: 0x49F8648, 0xB210;
 }
@@ -34,7 +52,7 @@ startup
 		{"UTP1", "-Blessed Are The Meek"},
 		{"RDOWN3", "-Money Lending And Other Sins III"},
 		{"RMARY1", "-We Loved Once and True I (Letter)"},
-		{"RMARY2", "-We Loved Once and True II"},	
+		{"RMARY2", "-We Loved Once and True II"},
 		//{"RMUD33", "-Pouring Fourth Oil III"},
 		{"RABI1", "-A Fisher of Men"},
 		{"UTP2", "-An American Pastoral Scene"},
@@ -127,7 +145,7 @@ startup
 		{"RJCK2", "-Trying Again"},
 		{"RABI3", "-A New Future Imagined"},
 		{"FIN2", "-American Venom"},
-		
+
 	};
 
 	vars.strangerScripts = new Dictionary<string,string> {
@@ -207,16 +225,16 @@ startup
 		{"RTLLY", "Tilly"},
 		{"RRFA1", "Rains Fall"},
 		{"RRTL1", "The Mercies of Knowledge I"},
-		{"RRTL2", "The Mercies of Knowledge II"},		
-		{"RRTL3", "The Mercies of Knowledge III"},		
-		{"RRTL4", "The Mercies of Knowledge IV"},		
-		{"RRTL5", "The Mercies of Knowledge V"},		
-		{"RRTL6", "The Mercies of Knowledge VI"},		
+		{"RRTL2", "The Mercies of Knowledge II"},
+		{"RRTL3", "The Mercies of Knowledge III"},
+		{"RRTL4", "The Mercies of Knowledge IV"},
+		{"RRTL5", "The Mercies of Knowledge V"},
+		{"RRTL6", "The Mercies of Knowledge VI"},
 		{"RRTL7", "The Mercies of Knowledge VII"},
-		{"RCLD21", "Of Men and Angels I"},		
+		{"RCLD21", "Of Men and Angels I"},
 		{"RCLD22", "Of Men and Angels II"},
-		{"RCLDN1", "Help a Brother Out"},						
-		{"RCLDN2", "Brothers and Sisters, One and All"},												
+		{"RCLDN1", "Help a Brother Out"},
+		{"RCLDN2", "Brothers and Sisters, One and All"},
 		{"RMLLR1", "The American Inferno, Burnt Out I"},
 		{"RMLLR2", "The American Inferno, Burnt Out II"},
 		{"RMLLR3", "The American Inferno, Burnt Out III"},
@@ -283,7 +301,7 @@ startup
    	// Add starter cutscenes for every chapter
 	foreach (var cs in vars.starterCutscenes) {
 		settings.Add(cs.Key, false, cs.Value, "starter_chapters");
-    }	
+    }
 
 
 	//Autosplitting
@@ -302,20 +320,20 @@ startup
 	}
 
 	settings.Add("any_final_split", true, "Any% final split", "splitters");
-	
+
 	settings.Add("splitter_chapters_start", false, "Split at the start of each chapter", "splitters");
-	settings.Add("splitter_chapters_end", false, "Split at the end of each chapter", "splitters");	
+	settings.Add("splitter_chapters_end", false, "Split at the end of each chapter", "splitters");
 
 	// Add starter cutscenes for every chapter
 	foreach (var cs in vars.starterCutscenes) {
 		settings.Add("SPLIT_" + cs.Key, true, cs.Value, "splitter_chapters_start");
-    }	
+    }
 
 	// Add ending cutscenes for every chapter
 	foreach (var cs in vars.finalCutscenes) {
 		settings.Add(cs.Key, true, cs.Value, "splitter_chapters_end");
-    }	
-}	
+    }
+}
 
 init
 {
@@ -363,9 +381,9 @@ split
 	bool flag_missions = ((old.mission_counter == current.mission_counter - 1 || (old.mission_counter == current.mission_counter - 2 && old.mission == "BRT1")) && settings[old.mission]); // mission split, advertising exception
 
 	bool flag_anyfinalsplit = (current.mission == "FIN2" && current.checkpoint == 13 && current.in_cutscene != 0 && old.in_cutscene == 0 && settings["any_final_split"]);
-	
+
 	bool flag_chapters = false;
-	
+
 	//print("T" + timer.CurrentTime.RealTime.ToString() + "------------------" + vars.timeSpanSplit.ToString());
 
 	// Chapter start
@@ -391,7 +409,7 @@ split
 			if (current.mission != old.mission && current.mission == "FUD1")
 				flag_chapters = true;
 	}
-	
+
 	// Chapter end
 	if (settings["splitter_chapters_end"]){
 		//if (current.cutscene != old.cutscene && (vars.finalCutscenes.ContainsKey(old.cutscene) ^ current.cutscene == "FIN1_EXT")) // Generic split with ch6 exception
@@ -418,7 +436,7 @@ split
 					vars.timeSpanSplit = timer.CurrentTime.RealTime + new TimeSpan(0, 0, 0, 0, sleep_delay);
 			}
 		}
-		
+
 		if ((settings["NBD1_"] && current.cutscene != old.cutscene && old.cutscene == "NBD1_EXT") || // Chapter 4 exception
 		    (settings["FIN1_"] && current.cutscene == "FIN1_EXT" && old.cutscene == "") || // Chapter 6 exception
 		    (settings["RBCH1_"] && current.cutscene == "RBCH1_RSC6_PTL" && current.cutscene != old.cutscene)) // Epilogue 1 exception
