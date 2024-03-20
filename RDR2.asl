@@ -1,11 +1,12 @@
 // When variables change for game patches, the offsets will generally stay the same.
 // This means the only change should be in the base address.
 //
-// Mission counter: Passed missions count in the progress statistics screen.
-// Loading: 0 during gameplay, 1-32767 when loading a save file. Restart game once or twice to
+// Mission counter: Passed missions count in the progress statistics screen. Variable counts all missions including strangers.
+// Loading: 0 during gameplay, 1-32767 when loading a save file, >32768 during black screen. Restart game once or twice to
 //     help with scanning (as the address is static). The correct value should slowly tick down
 //     while loading (and occasionally jump to a new starting value for the countdown).
-// Checkpoint: Example values for testing during Who Is Not Without Sin:
+// Checkpoint: Address always ends with 0050.
+// Example values for testing during Who Is Not Without Sin:
 //     3: Standing outside after intro
 //     4: Fighting the first NPC
 //     5: Chasing the witness
@@ -13,7 +14,7 @@
 //     7: Unstucking Swansons' foot
 //     25: Taking Swanson back to camp
 // Mission: Should be "none" when not on mission.
-// In cutscene: 0 if not, any other value if so
+// In cutscene: 0 if not, any other value if so. Same base address as for variable below.
 // Cutscene: Who Is Not Without Sin intro "RRVRD_RSC_1", cutscene after railroad bridge "REV1_MSC3"
 
 state("RDR2")
